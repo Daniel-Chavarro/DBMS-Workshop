@@ -68,11 +68,6 @@ class DatabaseFileManager:
             primary_key (str): The primary key column.
             foreign_keys (dict): The foreign keys for the table.
         """
-        
-        
-        if table_name in self.load_metadata().keys():
-            print("Table already exists")
-            return
 
         self.add_to_metadata(metadata_table)
         with open(self.file_path + table_name + ".csv", "w") as file:
@@ -142,6 +137,14 @@ class DatabaseFileManager:
         table = [row for row in table if all(condition(row, metadata_table) for condition in conditions)]
         self.save_table(table_name, table)
 
+    def drop_csv(self, table_name:str) -> None:
+        """
+        Drops a table from the database.
+
+        Parameters:
+            table_name (str): The name of the table.
+        """
+        os.remove(self.file_path + table_name + ".csv")
 
 if __name__ == "__main__":
     db = DatabaseFileManager("test")
