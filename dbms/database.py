@@ -1,10 +1,12 @@
 from file_manager import DatabaseFileManager
 import pickle
 
+
 class Database:
     def __init__(self, db_name:str):
         self.db_name = db_name
         self.file_manager = DatabaseFileManager(db_name)
+        self.file_path: str = self.file_manager.file_path
         self.metadata = self.load_metadata(self.file_manager.file_path + "metadata")
     
     def save_metadata(self ,metadata:dict) -> None:
@@ -59,7 +61,7 @@ class Database:
 
         self.metadata[table_name] = metadata_table
         self.save_metadata(self.metadata)
-        self.file_manager.create_csv(table_name, metadata_table)
+        self.file_manager.create_csv(table_name)
 
     def drop_table(self, table_name:str) -> None:
         '''
@@ -89,3 +91,5 @@ class Database:
             raise ValueError("Table not found")
         
         return self.metadata[table_name]
+    
+    

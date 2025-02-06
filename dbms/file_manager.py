@@ -12,12 +12,11 @@ import pickle
 
 class DatabaseFileManager:
     """
-    A class to manage database files and metadata.
+    A class to manage database files.
 
     Attributes:
         database_name (str): The name of the database.
         file_path (str): The path to the database files.
-        metadata (dict): The metadata of the database.
     """
 
     def __init__(self, database_name:str):
@@ -57,7 +56,7 @@ class DatabaseFileManager:
             writer.writerows(table)
             file.close()    
 
-    def create_csv(self, table_name: str, metadata_table:dict) -> None:
+    def create_csv(self, table_name: str) -> None:
         """
         Creates a new table in the database.
 
@@ -69,7 +68,6 @@ class DatabaseFileManager:
             foreign_keys (dict): The foreign keys for the table.
         """
 
-        self.add_to_metadata(metadata_table)
         with open(self.file_path + table_name + ".csv", "w") as file:
             file.close()
 
@@ -146,11 +144,5 @@ class DatabaseFileManager:
         """
         os.remove(self.file_path + table_name + ".csv")
 
-if __name__ == "__main__":
-    db = DatabaseFileManager("test")
-    print(db.metadata)
-    print(db.load_table("test"))
-    db.create_table("test_table", columns=["id", "name"], data_types=["int", "str"], primary_key="id", foreign_keys=None)
-    print(db.metadata)
-    
+
         
