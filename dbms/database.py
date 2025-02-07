@@ -1,4 +1,4 @@
-from file_manager import DatabaseFileManager
+from dbms.file_manager import DatabaseFileManager
 import pickle
 
 
