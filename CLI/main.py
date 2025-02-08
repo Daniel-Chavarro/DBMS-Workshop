@@ -46,9 +46,9 @@ def main():
                     
                     print(
                     """
-                    CREATE TABLE <table_name> <column_name1> <data_type1> <column_name2> <data_type2> ... PRIMARY_KEY <primary_key> FOREIGN_KEY <foreign_key1>
+                    CREATE TABLE <table_name> <column_name1> <data_type1> <column_name2> <data_type2> ... PRIMARY_KEY <primary_key> FOREIGN_KEY(OPTIONAL) <foreign_key1>
                     INSERT INTO <table_name> VALUES <value1> <value2> <value3> ...
-                    SELECT * FROM <table_name>
+                    SELECT * FROM <table_name> WHERE <condition>
                     UPDATE <table_name> SET <column_name1> <value1> <column_name2> <value2> ... WHERE <condition>
                     DELETE FROM <table_name> WHERE <condition>
                     DROP TABLE <table_name>
