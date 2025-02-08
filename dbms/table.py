@@ -35,12 +35,13 @@ class Table:
         selected_rows = []
 
         for row in table:
-            if condition_fn is None or condition_fn(row, self.metadata, condition_str):
-                if columns == ['*']:
-                    selected_rows.append(row)
-                else:
-                    selected_row = [row[self.metadata['columns'].index(col)] for col in columns]
-                    selected_rows.append(selected_row)
+            if any(row):  # Check if the row is not empty
+                if condition_fn is None or condition_fn(row, self.metadata, condition_str):
+                    if columns == ['*']:
+                        selected_rows.append(row)
+                    else:
+                        selected_row = [row[self.metadata['columns'].index(col)] for col in columns]
+                        selected_rows.append(selected_row)
 
         return selected_rows
 

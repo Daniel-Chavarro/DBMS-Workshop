@@ -86,12 +86,11 @@ class Parser:
         elif self.lex[0].upper() == "DELETE" and self.lex[1].upper() == "FROM":
             self.command = 6
             self.table = self.lex[2]
-            if "WHERE" in self.lex:
-                for i in range(len(self.lex)):
-                    if self.lex[i].upper() == "WHERE":
-                        condition = self.lex[i+1:]
-                        self.conditions = " ".join(condition).split(",")
-                        break
+            for i in range(len(self.lex)):
+                if self.lex[i].upper() == "WHERE":
+                    condition = self.lex[i+1:]
+                    self.conditions = " ".join(condition).split(",")
+                    break
             return self.command, self.table, self.conditions
         else:
             raise ValueError("Invalid command")
@@ -117,7 +116,7 @@ class Parser:
          
          
 
-
+"""
 if __name__ == "__main__":
     parser = Parser("CREATE TABLE students name VARCHAR20 age int grade int PRIMARY_KEY name")
     print(parser.parse())
@@ -131,3 +130,4 @@ if __name__ == "__main__":
     print(parser.parse())
     parser = Parser("UPDATE students SET age 21  WHERE name == John")
     print(parser.parse())
+"""

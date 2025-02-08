@@ -51,7 +51,7 @@ class DatabaseFileManager:
             table_name (str): The name of the table.
             table (list): The table data.
         """
-        with open(self.file_path + table_name + ".csv", "w") as file:
+        with open(self.file_path + table_name + ".csv", "w", newline='') as file:
             writer = csv.writer(file, delimiter='|')
             writer.writerows(table)
             file.close()    
@@ -145,6 +145,3 @@ class DatabaseFileManager:
             table_name (str): The name of the table.
         """
         os.remove(self.file_path + table_name + ".csv")
-
-
-        
