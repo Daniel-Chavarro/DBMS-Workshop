@@ -20,6 +20,7 @@ UDSQL is a simple command-line interface (CLI) for managing databases. It allows
   - `os`
   - `sys`
   - `time`
+  - `tabulate = 0.9.0`
 
 ## Setup
 
