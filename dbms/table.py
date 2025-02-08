@@ -95,8 +95,7 @@ class Table:
             elif data_types[i] == "str":
                 values[key] = str(value)
             else:
-                raise ValueError("Bad input values")
-        
+                raise ValueError("Bad input values")      
 
     def apply_data_type_input_list(self, values:list) -> None:
         '''

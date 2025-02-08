@@ -48,6 +48,8 @@ class Executor:
         self.db.create_table(table_name, columns, data_types, primary_key, foreign_keys)
     
     def insert_into(self, table_name: str, values: list):
+        if table_name not in self.db.tables:
+            raise ValueError("Table not found")
         self.db.tables[table_name].insert_row(values)
     
     def update(self, table_name: str, update_values:dict, condition_str: str ):
