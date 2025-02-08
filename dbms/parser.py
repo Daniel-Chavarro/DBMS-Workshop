@@ -80,13 +80,18 @@ class Parser:
         elif self.lex[0].upper() == "UPDATE" and self.lex[2].upper() == "SET":
             self.command = 5
             self.table = self.lex[1]
+            flag = True
             for i in range(2, len(self.lex)):
                 if self.lex[i].upper() == "WHERE":
+                    flag = False
                     argument = self.lex[3:i]
                     self.args = self.normalize(argument, 2)
                     condition = self.lex[i+1:]
                     self.conditions = " ".join(condition).split(",")
                     break
+            if flag:
+                argument = self.lex[3:]
+                self.args = self.normalize(argument, 2)
             return self.command, self.table, self.args, self.conditions
         
         # DELETE operation

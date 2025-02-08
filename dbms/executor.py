@@ -60,7 +60,12 @@ class Executor:
         self.db.tables[table_name].update(self.condition_fn, condition_str, update_values)
 
     def delete(self, table_name: str, condition_str: list):
-        condition_str = "".join(condition_str)
+        if table_name not in self.db.tables:
+            raise ValueError("Table not found")
+        if condition_str != None:
+            condition_str = "".join(condition_str)
+        else:
+            condition_str = "True"
         self.db.tables[table_name].delete(self.condition_fn, condition_str)
 
     def select(self, table_name: str, columns: list, condition_str: str = None):
@@ -81,9 +86,9 @@ class Executor:
         table = self.db.tables[table_name]
         if condition_str != None:
             condition_str = "".join(condition_str)  
-            print(table.select(columns, self.condition_fn, condition_str))
+            table.select(columns, self.condition_fn, condition_str)
         else:
-            print(table.select(columns))
+            table.select(columns)
     
     def drop_table(self, table_name: str):
         self.db.drop_table(table_name)

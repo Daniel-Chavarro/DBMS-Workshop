@@ -122,8 +122,11 @@ class Database:
         '''
         Drops the database.
         '''
-        for table in self.metadata.keys():
-            self.drop_table(table)
+        try:
+            for table in self.metadata.keys():
+                self.drop_table(table)
+        except:
+            pass
         self.metadata = {}
         self.tables = {}
         os.remove(self.file_path + "metadata")

@@ -1,3 +1,6 @@
+from tabulate import tabulate
+
+
 class Table:
     def __init__(self, name, database):
         """Initialize a table inside a database."""
@@ -48,8 +51,23 @@ class Table:
                         selected_row = [row[self.metadata['columns'].index(col)] for col in columns]
                         selected_rows.append(selected_row)
 
-        return selected_rows
+        self.print_selected_rows(selected_rows, columns)
 
+    def print_selected_rows(self, selected_rows, columns):
+        """
+        Prints the selected rows in a tabular format.
+
+        Parameters:
+            selected_rows (list): The list of selected rows.
+            columns (list): The list of columns to select. Use ['*'] to select all columns.
+        """
+        if columns == ['*']:
+            columns = self.metadata['columns']
+        
+        # Print the table using tabulate
+        print(tabulate(selected_rows, headers=columns, tablefmt="grid"))
+
+    
     def apply_data_type_input_dict(self, values:dict):
         """
         Applies the data types to the input values.
