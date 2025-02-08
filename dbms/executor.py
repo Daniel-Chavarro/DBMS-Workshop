@@ -29,28 +29,42 @@ class Executor:
                 self.update(*args)
             case 6:
                 self.delete(*args)
+            case 7:
+                self.drop_table(args[0])
+            case 8:
+                self.drop_database()
             case _:
                 raise ValueError("Invalid command")
-    
+    @staticmethod
     def condition_fn(row, metadata, condition_str):
         """Safely evaluate a condition string by mapping column names to values."""
         col_names = metadata["columns"]  # Example: ["id", "name", "age"]
         col_values = {col: row[i] for i, col in enumerate(col_names)}
         return eval(condition_str, {"__builtins__": None}, col_values)   
 
-    def create_table(self, table_name: str, columns: list, data_types: list, primary_key: str, foreign_keys: list = []):
+    def create_table(self, table_name: str, columns: list, data_types: list, primary_key: str, foreign_keys=None):
+        if foreign_keys is None:
+            foreign_keys = []
         self.db.create_table(table_name, columns, data_types, primary_key, foreign_keys)
     
     def insert_into(self, table_name: str, values: list):
         self.db.tables[table_name].insert_row(values)
     
-    def update(self, table_name: str, condition_str: str, update_values:dict):
+    def update(self, table_name: str, update_values:dict, condition_str: str ):
+        if table_name not in self.db.tables:
+            raise ValueError("Table not found")
+        if condition_str != None:
+            condition_str = "".join(condition_str)
+        else:
+            condition_str = "True"
         self.db.tables[table_name].update(self.condition_fn, condition_str, update_values)
 
-    def delete(self, table_name: str, condition_str: str):
+    def delete(self, table_name: str, condition_str: list):
+        condition_str = "".join(condition_str)
         self.db.tables[table_name].delete(self.condition_fn, condition_str)
 
     def select(self, table_name: str, columns: list, condition_str: str = None):
+
         """
         Selects rows from a table based on columns and conditions.
 
@@ -62,8 +76,17 @@ class Executor:
         Returns:
             list: The selected rows.
         """
+        if table_name not in self.db.tables:
+            raise ValueError("Table not found")
         table = self.db.tables[table_name]
-        if condition_str:
+        if condition_str != None:
+            condition_str = "".join(condition_str)  
             print(table.select(columns, self.condition_fn, condition_str))
         else:
             print(table.select(columns))
+    
+    def drop_table(self, table_name: str):
+        self.db.drop_table(table_name)
+    
+    def drop_database(self):
+        self.db.drop_database()

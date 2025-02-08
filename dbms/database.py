@@ -1,6 +1,8 @@
+import os
+import pickle
 from dbms.file_manager import DatabaseFileManager
 from dbms.table import Table
-import pickle
+from dbms.exeptions import DroppedDatabaseError
 
 
 class Database:
@@ -10,7 +12,7 @@ class Database:
         self.file_path: str = self.file_manager.file_path
         self.metadata = self.load_metadata(self.file_manager.file_path + "metadata")
         self.tables = {name: Table(name, self) for name in self.metadata.keys()}
-    
+
     def save_metadata(self ,metadata:dict) -> None:
         """
         Overrides the metadata to the metadata file.
@@ -39,16 +41,16 @@ class Database:
             raise FileNotFoundError("Metadata file not found")
 
     def create_table(self, table_name: str, columns:list, data_types:list , primary_key:list, foreing_keys) -> None:
-        '''
+        """
         Creates a new table in the database.
-        
+
         Parameters:
             table_name (str): The name of the table.
             columns (list): The list of column names.
             data_types (list): The list of data types for the columns.
             primary_key (str): The primary key column.
             foreign_keys (dict): The foreign keys for the table.
-        '''
+        """
 
 
         if table_name in self.metadata.keys():
@@ -65,6 +67,7 @@ class Database:
         self.tables[table_name] = Table(table_name, self)
         self.save_metadata(self.metadata)
         self.file_manager.create_csv(table_name)
+        print(f"Table {table_name} created")
 
     def drop_table(self, table_name:str) -> None:
         '''
@@ -80,6 +83,7 @@ class Database:
         del self.tables[table_name]
         self.save_metadata(self.metadata)
         self.file_manager.drop_csv(table_name)
+        print(f"Table {table_name} dropped")
     
     def get_info_table(self, table_name:str) -> dict:
         '''
@@ -96,4 +100,33 @@ class Database:
         
         return self.metadata[table_name]
     
-    
+    def get_info_database(self) -> dict:
+        '''
+        Returns the metadata of the database.
+
+        Returns:
+            dict: The metadata of the database.
+        '''
+        return self.metadata
+
+    def get_tables(self) -> list:
+        '''
+        Returns the list of tables in the database.
+
+        Returns:
+            list: The list of tables in the database.
+        '''
+        return list(self.metadata.keys())    
+
+    def drop_database(self) -> None:
+        '''
+        Drops the database.
+        '''
+        for table in self.metadata.keys():
+            self.drop_table(table)
+        self.metadata = {}
+        self.tables = {}
+        os.remove(self.file_path + "metadata")
+        os.rmdir(self.file_path)
+
+        raise DroppedDatabaseError()

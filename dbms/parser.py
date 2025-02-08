@@ -26,11 +26,15 @@ class Parser:
                 columns = []
                 data_types = []
                 i = 3
-                while i < len(self.lex) and self.lex[i].upper() != 'PRIMARY_KEY':
-                    column, data_type = self.lex[i:i+2]
-                    columns.append(column)
-                    data_types.append(data_type)
-                    i += 2
+                try:
+                    while self.lex[i].upper() != 'PRIMARY_KEY':
+                        column, data_type = self.lex[i:i+2]
+                        columns.append(column)
+                        data_types.append(data_type)
+                        i += 2
+                    
+                except:
+                    raise ValueError("Invalid command")
                 self.args["columns"] = columns
                 self.args["data_types"] = data_types
                 self.args["primary_key"] = self.lex[i+1]
@@ -45,7 +49,10 @@ class Parser:
                 self.command = 1
                 self.args = self.lex[2]
                 return self.command, self.args
-        
+
+            else:
+                raise ValueError("Invalid command")
+
         # INSERT operation
         elif self.lex[0].upper() == "INSERT" and self.lex[1].upper() == "INTO":
             self.command = 3
@@ -92,6 +99,17 @@ class Parser:
                     self.conditions = " ".join(condition).split(",")
                     break
             return self.command, self.table, self.conditions
+        # DROP operation
+        elif self.lex[0].upper() == "DROP":
+            if self.lex[1].upper() == "DATABASE":
+                self.command = 8
+                return [self.command]
+            elif self.lex[1].upper() == "TABLE":
+                self.command = 7
+                self.table = self.lex[2]
+                return self.command, self.table
+            else:
+                raise ValueError("Invalid command")
         else:
             raise ValueError("Invalid command")
 

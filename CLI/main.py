@@ -5,6 +5,7 @@
 
 import sys
 import os
+import time
 # Add project root (UDSQL) to sys.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -12,45 +13,66 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from dbms.database import Database
 from dbms.parser import Parser
 from dbms.executor import Executor
+from dbms.exeptions import DroppedDatabaseError
 
 def main():
-    db_name = input("Enter the database name:")
-    db = Database(db_name)
-    print("\nDatabase CLI - Type 'help' to see all commands.")
-
     while True:
-        command = input("db>")
-        command_str = command
-
-        if command.lower() == "exit":
+        clear_screen()
+        print("Welcome to UDSQL")
+        print(f"""Available databases:
+              {', '.join(get_databases_aviable())}""")
+        print("If want to create a new database, type the name of the database.")
+        print("If you want to exit, type 'exit'")
+         
+        db_name = input("Enter the database name:")
+        if db_name == "exit":
             print("Exiting CLI.bye-bye")
-            break
+            return
+        clear_screen()
+        db = Database(db_name)
+        print("\nDatabase CLI - Type 'help' to see all commands.")
 
-        try:
+        while True:
+            command = input("db>")
+            command_str = command
 
-            if command == "help":
-                
-                print(
-                """
-                create table <table_name> <column_name1> <data_type1> <column_name2> <data_type2> ... PRIMARY_KEY <primary_key> (optional: FOREING_KEY) <foreign_key1> <foreign_key2> ...
-                insert into <table_name> values <value1> <value2> <value3> ...
-                select * from <table_name>
-                update <table_name> set <column_name1> <value1> <column_name2> <value2> ... where <condition>
-                delete from <table_name> where <condition>
-                exit
-                """
-                )
+            if command.lower() == "exit":
+                print("Exiting CLI.bye-bye")
+                return
 
-            else:
-                parse = Parser(command_str)
-                print(
-                parse.parse()
-                )
-                executor = Executor(db)
-                executor.execute(*parse.parse())
-        except Exception as e:
-            print(f"Error: {e}")
+            try:
 
+                if command == "help":
+                    
+                    print(
+                    """
+                    CREATE TABLE <table_name> <column_name1> <data_type1> <column_name2> <data_type2> ... PRIMARY_KEY <primary_key> FOREIGN_KEY <foreign_key1>
+                    INSERT INTO <table_name> VALUES <value1> <value2> <value3> ...
+                    SELECT * FROM <table_name>
+                    UPDATE <table_name> SET <column_name1> <value1> <column_name2> <value2> ... WHERE <condition>
+                    DELETE FROM <table_name> WHERE <condition>
+                    DROP TABLE <table_name>
+                    DROP DATABASE 
+                    EXIT
+                    """
+                    )
+
+                else:
+                    parse = Parser(command_str)
+                    executor = Executor(db)
+                    executor.execute(*parse.parse())
+            except DroppedDatabaseError as e:
+                print(f"{e}")
+                time.sleep(2)
+                break
+            except Exception as e:
+                print(f"Error: {e}")
+
+def get_databases_aviable():
+    return os.listdir("data")
+
+def clear_screen():
+    os.system("cls")
 
 if __name__ == "__main__":
     main()

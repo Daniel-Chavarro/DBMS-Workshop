@@ -134,7 +134,7 @@ class DatabaseFileManager:
         table = self.load_csv(table_name)
         
         
-        table = [row for row in table if condition_fn(row, metadata_table, condition_str)]
+        table = [row for row in table if not condition_fn(row, metadata_table, condition_str)]
         self.save_table(table_name, table)
 
     def drop_csv(self, table_name:str) -> None:
