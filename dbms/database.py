@@ -1,4 +1,5 @@
 from dbms.file_manager import DatabaseFileManager
+from dbms.table import Table
 import pickle
 
 
@@ -8,6 +9,7 @@ class Database:
         self.file_manager = DatabaseFileManager(db_name)
         self.file_path: str = self.file_manager.file_path
         self.metadata = self.load_metadata(self.file_manager.file_path + "metadata")
+        self.tables = {name: Table(name, self) for name in self.metadata.keys()}
     
     def save_metadata(self ,metadata:dict) -> None:
         """
@@ -36,7 +38,7 @@ class Database:
         except FileNotFoundError:
             raise FileNotFoundError("Metadata file not found")
 
-    def create_table(self, table_name: str, columns:list, data_types:list, primary_key:list, foreing_keys:list) -> None:
+    def create_table(self, table_name: str, columns:list, data_types:list , primary_key:list, foreing_keys) -> None:
         '''
         Creates a new table in the database.
         
@@ -56,10 +58,11 @@ class Database:
             "columns": columns,
             "data_types": data_types,
             "primary_key": primary_key,
-            "foreign_keys": foreing_keys or {}
+            "foreign_keys": foreing_keys
         }
 
         self.metadata[table_name] = metadata_table
+        self.tables[table_name] = Table(table_name, self)
         self.save_metadata(self.metadata)
         self.file_manager.create_csv(table_name)
 
@@ -74,6 +77,7 @@ class Database:
             raise ValueError("Table not found")
         
         del self.metadata[table_name]
+        del self.tables[table_name]
         self.save_metadata(self.metadata)
         self.file_manager.drop_csv(table_name)
     

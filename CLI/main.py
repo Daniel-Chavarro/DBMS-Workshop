@@ -11,6 +11,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Now import dbms modules
 from dbms.database import Database
 from dbms.parser import Parser
+from dbms.executor import Executor
 
 def main():
     db_name = input("Enter the database name:")
@@ -31,7 +32,7 @@ def main():
                 
                 print(
                 """
-                create table <table_name> <column_name1> <data_type1> <column_name2> <data_type2> ... <primary_key> <foreign_key1> <foreign_key2> ...
+                create table <table_name> <column_name1> <data_type1> <column_name2> <data_type2> ... PRIMARY_KEY <primary_key> (optional: FOREING_KEY) <foreign_key1> <foreign_key2> ...
                 insert into <table_name> values <value1> <value2> <value3> ...
                 select * from <table_name>
                 update <table_name> set <column_name1> <value1> <column_name2> <value2> ... where <condition>
@@ -45,7 +46,8 @@ def main():
                 print(
                 parse.parse()
                 )
-
+                executor = Executor(db)
+                executor.execute(*parse.parse())
         except Exception as e:
             print(f"Error: {e}")
 

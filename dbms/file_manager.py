@@ -103,7 +103,7 @@ class DatabaseFileManager:
         table.append(row)
         self.save_table(table_name, table)
 
-    def update_rows(self, table_name:str,   metadata_table , *conditions , **kwargs) -> None:  
+    def update_rows(self, table_name:str,   metadata_table:dict , condition_fn , condition_str:str , update_values:dict) -> None:  
         
         """
         Updates a row to the table.
@@ -116,12 +116,14 @@ class DatabaseFileManager:
         table = self.load_csv(table_name)
         
         for row in table:
-            if all(condition(row, metadata_table) for condition in conditions):
-                for key, value in kwargs.items():
-                    row[metadata_table["columns"].index(key)] = value
+            if condition_fn(row, metadata_table, condition_str):
+                for key, value in update_values.items():
+                    index = metadata_table["columns"].index(key)
+                    row[index] = value
+        
         self.save_table(table_name, table)
 
-    def delete_rows(self, table_name:str, metadata_table, *conditions) -> None:
+    def delete_rows(self, table_name:str, metadata_table, condition_fn, condition_str) -> None:
         """
         Deletes a rows to the table.
 
@@ -132,7 +134,7 @@ class DatabaseFileManager:
         table = self.load_csv(table_name)
         
         
-        table = [row for row in table if all(condition(row, metadata_table) for condition in conditions)]
+        table = [row for row in table if condition_fn(row, metadata_table, condition_str)]
         self.save_table(table_name, table)
 
     def drop_csv(self, table_name:str) -> None:

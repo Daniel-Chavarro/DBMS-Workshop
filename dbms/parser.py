@@ -6,7 +6,7 @@ class Parser:
         self.command = None
         self.conditions = None
         self.table = None
-        self.args = None
+        self.args = {}
 
     def parse(self):
         """
@@ -22,8 +22,23 @@ class Parser:
             # Table operation
             if self.lex[1].upper() == "TABLE":
                 self.command = 2
-                self.args = self.lex[2:]
-                return self.command, self.args
+                self.table = self.lex[2]
+                columns = []
+                data_types = []
+                i = 3
+                while i < len(self.lex) and self.lex[i].upper() != 'PRIMARY_KEY':
+                    column, data_type = self.lex[i:i+2]
+                    columns.append(column)
+                    data_types.append(data_type)
+                    i += 2
+                self.args["columns"] = columns
+                self.args["data_types"] = data_types
+                self.args["primary_key"] = self.lex[i+1]
+                try:
+                    self.args.append({"foreign_keys": self.lex[i+2:]})
+                except:
+                    pass
+                return self.command, self.table, self.args
             
             # Database operation
             elif self.lex[1].upper() == "DATABASE":
@@ -35,7 +50,7 @@ class Parser:
         elif self.lex[0].upper() == "INSERT" and self.lex[1].upper() == "INTO":
             self.command = 3
             self.table = self.lex[2]
-            self.args = self.lex[3:]
+            self.args = self.lex[4:]
             return self.command, self.table, self.args
         
         # SELECT operation
@@ -61,7 +76,7 @@ class Parser:
             for i in range(2, len(self.lex)):
                 if self.lex[i].upper() == "WHERE":
                     argument = self.lex[3:i]
-                    self.args = " ".join(argument).split(",")
+                    self.args = self.normalize(argument, 2)
                     condition = self.lex[i+1:]
                     self.conditions = " ".join(condition).split(",")
                     break
@@ -80,4 +95,39 @@ class Parser:
             return self.command, self.table, self.conditions
         else:
             raise ValueError("Invalid command")
-            
+
+    def normalize(self, value:list[str], n_to_group:int) -> list[str]:
+        """
+        Normalizes the values of the list, deleting spaces and divide it in places.
+
+        Parameters:
+            value (list): The list of values to normalize.
+
+        Returns:
+            list: A list of normalized values.
+        """
+        output = {}
+        partition = value
+        while len(partition) > 0:
+            output[partition[0]] = partition[1]
+            partition = partition[2:]
+        
+        return output
+
+         
+         
+
+
+if __name__ == "__main__":
+    parser = Parser("CREATE TABLE students name VARCHAR20 age int grade int PRIMARY_KEY name")
+    print(parser.parse())
+    parser = Parser("INSERT INTO students John 20 3.5")
+    print(parser.parse())
+    parser = Parser("SELECT name age FROM students WHERE age > 20")
+    print(parser.parse())
+    parser = Parser("UPDATE students SET age 21 grade 4.0 WHERE name == John")
+    print(parser.parse())
+    parser = Parser("DELETE FROM students WHERE age > 20")
+    print(parser.parse())
+    parser = Parser("UPDATE students SET age 21  WHERE name == John")
+    print(parser.parse())
