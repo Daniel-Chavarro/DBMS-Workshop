@@ -28,4 +28,4 @@ UDSQL is a simple command-line interface (CLI) for managing databases. It allows
 First, clone the repository to your local machine using Git:
 
 ```bash
-git clone <repository-url>
+git clone <https://github.com/Daniel-Chavarro/DBMS-Workshop.git>
