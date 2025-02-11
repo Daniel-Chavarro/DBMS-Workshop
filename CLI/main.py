@@ -17,6 +17,9 @@ from dbms.exeptions import DroppedDatabaseError
 
 def main():
     while True:
+        
+        if not os.path.exists("data"):
+            os.makedirs("data")
         clear_screen()
         print("Welcome to UDSQL")
         print(f"""Available databases:

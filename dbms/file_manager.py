@@ -29,6 +29,7 @@ class DatabaseFileManager:
 
         ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.database_name = database_name
+        
         self.file_path: str = os.path.join(ROOT_DIR,'data' ,database_name, '')
         self.create_database_folder()
 
