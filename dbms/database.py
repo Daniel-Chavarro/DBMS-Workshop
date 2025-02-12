@@ -26,7 +26,7 @@ class Database:
             db_name (str): The name of the database.
         '''
         self.db_name = db_name
-        self.file_manager = DatabaseFileManager(db_name)
+        self.file_manager = DatabaseFileManager(self)
         self.file_path: str = self.file_manager.file_path
         self.metadata = self.load_metadata(self.file_manager.file_path + "metadata")
         self.tables = {name: Table(name, self) for name in self.metadata.keys()}

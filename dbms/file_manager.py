@@ -19,18 +19,18 @@ class DatabaseFileManager:
         file_path (str): The path to the database files.
     """
 
-    def __init__(self, database_name:str):
+    def __init__(self, db):
         """
         The constructor for DatabaseFileManager class.
 
         Parameters:
-            database_name (str): The name of the database.
+            db (Database): The database object.
         """
 
         ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        self.database_name = database_name
-        
-        self.file_path: str = os.path.join(ROOT_DIR,'data' ,database_name, '')
+        self.db = db
+        self.database_name = db.db_name
+        self.file_path: str = os.path.join(ROOT_DIR,'data' ,self.database_name, '')
         self.create_database_folder()
 
     def create_database_folder(self) -> None:
@@ -86,7 +86,7 @@ class DatabaseFileManager:
         try:
             with open(self.file_path + table_name + ".csv", "r") as file:
                 reader = csv.reader(file, delimiter='|')
-                table = [row for row in reader]
+                table = [self.apply_data_type_input_list(row, table_name) for row in reader]
                 file.close()
                 return table
         except FileNotFoundError:
@@ -146,3 +146,34 @@ class DatabaseFileManager:
             table_name (str): The name of the table.
         """
         os.remove(self.file_path + table_name + ".csv")
+
+    def apply_data_type_input_list(self, values:list, table_name:str) -> list:
+        '''
+        Applies the data types to the input values.
+
+        Parameters:
+            table_name (str): The name of the table.
+            values (list/dict): The values to apply the data types.
+        '''
+        
+        data_types = self.db.get_info_table(table_name)["data_types"]
+        if len(values) != len(data_types):
+            raise ValueError("Bad input values")
+        
+        for i in range(len(values)):
+                if data_types[i] == "int":
+                    try:
+                        values[i] = int(values[i])
+                    except:
+                        raise ValueError("Bad input values")
+                elif data_types[i] == "float":
+                    try:
+                        values[i] = float(values[i])
+                    except:
+                        raise ValueError("Bad input values")
+                elif data_types[i] == "str":
+                    values[i] = str(values[i])
+                else:
+                    raise ValueError("Bad input values")
+        
+        return values

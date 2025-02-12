@@ -1,5 +1,8 @@
 from dbms.database import Database
 
+import operator
+import re
+
 class Executor:
     """
     Executes the commands on the database.
@@ -44,12 +47,35 @@ class Executor:
                 raise ValueError("Invalid command")
     
     @staticmethod
-    def condition_fn(row, metadata, condition_str):
-        """Safely evaluate a condition string by mapping column names to values."""
-        col_names = metadata["columns"]  # Example: ["id", "name", "age"]
-        col_values = {col: row[i] for i, col in enumerate(col_names)}
-        return eval(condition_str, {"__builtins__": None}, col_values)   
-
+    def condition_fn(row: list, metadata: dict, condition_str: str) -> bool:
+        """
+        Evalúa una condición en forma de string usando la sintaxis de Python.
+        La condición puede incluir operadores lógicos (and, or, not), comparaciones y paréntesis.
+        
+        Parameters:
+            row (list): Los valores de la fila.
+            metadata (dict): Un diccionario que contiene la lista de columnas (bajo la clave "columns").
+            condition_str (str): La condición a evaluar, por ejemplo "col1 > 5 and (col2 == 'abc' or col3 < 10)".
+            
+        Returns:
+            bool: True si la condición se cumple para la fila, False en caso contrario.
+        
+        Raises:
+            ValueError: Si la evaluación de la condición falla o no retorna un valor booleano.
+        """
+        # Construir un entorno mapeando cada columna a su valor correspondiente de la fila.
+        env = {col: row[i] for i, col in enumerate(metadata["columns"])}
+        
+        try:
+            result = eval(condition_str, {"__builtins__": None}, env)
+            
+            if not isinstance(result, bool):
+                raise ValueError("La expresión de condición no devolvió un booleano.")
+            
+            return result
+        except Exception as e:
+            raise ValueError(f"Error evaluando la condición '{condition_str}'")
+        
     def create_table(self, table_name: str, columns: list, data_types: list, primary_key: str, foreign_keys=None):
         '''Creates a table in the database.
         
