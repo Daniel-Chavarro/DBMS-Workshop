@@ -3,41 +3,55 @@ from tabulate import tabulate
 
 class Table:
     def __init__(self, name, database):
-        """Initialize a table inside a database."""
+        """Initialize a table inside a database.
+        
+        Parameters:
+            name (str): The name of the table.
+            database (Database): The parent database.
+            """
         self.name = name
         self.database = database  # Parent database
         self.metadata = database.metadata[name]
         self.file_manager = database.file_manager
 
     def insert_row(self, row):
-        """Inserts a row into the table, ensuring it follows schema."""
+        """Inserts a row into the table, ensuring it follows schema.
+        
+        Parameters:
+            row (list): The row to insert."""
         self.apply_data_type_input_list(row)
         self.file_manager.insert_row_csv(self.name, row)
         print(f"Succesfully inserted row into {self.name}")
 
     def update(self, condition_fn, condition_str , update_values:dict):
-        """Updates rows based on a condition."""
+        """Updates rows based on a condition.
+        
+        Parameters:
+            condition_fn (function): The function to evaluate conditions on rows.
+            condition_str (str): The condition string to pass to the condition function.
+            update_values (dict): The values to update."""
         self.apply_data_type_input_dict(update_values)
         self.file_manager.update_rows(self.name, self.metadata , condition_fn, condition_str , update_values)
         print(f"Succesfully updated row into {self.name}")
 
     def delete(self, condition_fn, condition_str):
-        """Deletes rows matching a condition."""
+        """Deletes rows matching a condition.
+        
+        Parameters:
+            condition_fn (function): The function to evaluate conditions on rows.
+            condition_str (str): The condition string to pass to the condition function."""
         self.file_manager.delete_rows(self.name, self.metadata , condition_fn, condition_str)
         print(f"Succesfully deleted row into {self.name}")
     
-    
     def select(self, columns, condition_fn=None, condition_str=None):
         """
-        Selects rows based on columns and conditions.
+        Selects rows based on columns and conditions and prints it.
 
         Parameters:
             columns (list): The list of columns to select. Use ['*'] to select all columns.
             condition_fn (function): The function to evaluate conditions on rows.
             condition_str (str): The condition string to pass to the condition function.
 
-        Returns:
-            list: The selected rows.
         """
         table = self.file_manager.load_csv(self.name)
         selected_rows = []
@@ -67,7 +81,6 @@ class Table:
         # Print the table using tabulate
         print(tabulate(selected_rows, headers=columns, tablefmt="grid"))
 
-    
     def apply_data_type_input_dict(self, values:dict):
         """
         Applies the data types to the input values.

@@ -17,6 +17,12 @@ from dbms.exeptions import DroppedDatabaseError
 
 def main():
     while True:
+        '''Main function for the CLI
+        This function runs a loop that takes the input from the user and executes the command until the user types 'exit'.
+        The function also displays the help message when the user types 'help'.
+        The function catches any exceptions raised during the execution of the command and displays an error message.
+        '''
+        
         
         if not os.path.exists("data"):
             os.makedirs("data")

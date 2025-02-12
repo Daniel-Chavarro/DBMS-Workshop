@@ -5,8 +5,26 @@ from dbms.table import Table
 from dbms.exeptions import DroppedDatabaseError
 
 
+
 class Database:
+    '''
+    Represents a database.
+    
+    Attributes:
+        db_name (str): The name of the database.
+        file_manager (DatabaseFileManager): The file manager for the database.
+        file_path (str): The path to the database file.
+        metadata (dict): The metadata of the database.
+        tables (dict): The tables in the database.
+    '''
+    
     def __init__(self, db_name:str):
+        '''
+        Initializes the database.
+        
+        Parameters:
+            db_name (str): The name of the database.
+        '''
         self.db_name = db_name
         self.file_manager = DatabaseFileManager(db_name)
         self.file_path: str = self.file_manager.file_path
