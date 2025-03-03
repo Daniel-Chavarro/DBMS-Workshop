@@ -70,7 +70,7 @@ cd DBMS-Workshop
 Navigate to the `cli` directory and run the main script:
 
 ```bash
-python CLI/main.py
+python main.py
 ```
 
 ### Basic Commands
